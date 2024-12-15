@@ -1,4 +1,4 @@
-# [a forked repo from sudoku](https://sudoku.jonasgeiler.com)
+# [a modified repository forked from sudoku](https://sudoku.jonasgeiler.com)
 
 小组成员
 
