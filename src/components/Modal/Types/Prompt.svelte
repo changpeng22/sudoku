@@ -14,7 +14,6 @@
   
 	// 点击按钮时的处理函数
 	function handleButton() {
-		console.log("常鹏",data.callback);
 	  if (data.callback) data.callback(value); // 调用外部回调函数
 	  hideModal(); // 隐藏模态框
 	}
