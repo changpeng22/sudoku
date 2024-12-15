@@ -76,6 +76,7 @@
 
 <svelte:window on:keydown={handleKey} /><!--on:beforeunload|preventDefault={e => e.returnValue = ''} />-->
 
+<!-- 常鹏：键盘网格 -->
 <div class="keyboard-grid">
 
 	{#each Array(10) as _, keyNum}

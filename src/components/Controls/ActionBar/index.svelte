@@ -19,4 +19,5 @@
 			@apply flex-row;
 		}
 	}
+
 </style>
