@@ -1,27 +1,21 @@
 <script>
 	import { candidates } from '@sudoku/stores/candidates';
-	// 钿哥增加import
-	import { userGrid, history, historyIndex } from '@sudoku/stores/grid';
+	import { userGrid } from '@sudoku/stores/grid';//userGrid是当前的网格
 	import { cursor } from '@sudoku/stores/cursor';
 	import { hints } from '@sudoku/stores/hints';
 	import { notes } from '@sudoku/stores/notes';
 	import { settings } from '@sudoku/stores/settings';
 	import { keyboardDisabled } from '@sudoku/stores/keyboard';
 	import { gamePaused } from '@sudoku/stores/game';
-
 	$: hintsAvailable = $hints > 0;
-	// 钿哥增加undo和redo的判断
-	$: undoUnavailable = $gamePaused || !($historyIndex > -1);
-	$: redoUnavailable = $gamePaused || !($historyIndex < $history.length - 2);
 
-	// 钿哥修改提示函数
 	function handleHint() {
 		if (hintsAvailable) {
-			// if ($candidates.hasOwnProperty($cursor.x + ',' + $cursor.y)) {
-			// 	candidates.clear($cursor);
-			// }
+			if ($candidates.hasOwnProperty($cursor.x + ',' + $cursor.y)) {
+				candidates.clear($cursor);
+			}
 
-			userGrid.applyHint(settings.maxCandidates);
+			userGrid.applyHint($cursor);
 		}
 	}
 
@@ -69,22 +63,22 @@
 	</button>
 	
 	
-	<!-- 钿哥增加on:click={undo} -->
-	<button class="btn btn-round" disabled={undoUnavailable} title="Undo" on:click={userGrid.undo}>
+	<!-- 常鹏：上一步 -->
+	<button class="btn btn-round" disabled={$gamePaused} title="Undo">
 		<svg class="icon-outline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
 		</svg>
 	</button>
 
-	<!-- 钿哥增加on:click={redo} -->
-	<button class="btn btn-round" disabled={redoUnavailable} title="Redo" on:click={userGrid.redo}>
+	<!-- 常鹏：下一步 -->
+	<button class="btn btn-round" disabled={$gamePaused} title="Redo">
 		<svg class="icon-outline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10h-10a8 8 90 00-8 8v2M21 10l-6 6m6-6l-6-6" />
 		</svg>
 	</button>
 
-	<!-- 钿哥修改判定条件 -->
-	<button class="btn btn-round btn-badge" disabled={!hintsAvailable} on:click={handleHint} title="Hints ({$hints})">
+	<!-- 常鹏：提示 -->
+	<button class="btn btn-round btn-badge" disabled={$keyboardDisabled || !hintsAvailable || $userGrid[$cursor.y][$cursor.x] !== 0} on:click={handleHint} title="Hints ({$hints})">
 		<svg class="icon-outline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
 		</svg>
@@ -93,7 +87,6 @@
 			<span class="badge" class:badge-primary={hintsAvailable}>{$hints}</span>
 		{/if}
 	</button>
-
 	<!-- 常鹏：笔记 -->
 	<button class="btn btn-round btn-badge" on:click={notes.toggle} title="Notes ({$notes ? 'ON' : 'OFF'})">
 		<svg class="icon-outline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">

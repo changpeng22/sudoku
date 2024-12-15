@@ -14,14 +14,14 @@
 	$: undoUnavailable = $gamePaused || !($historyIndex > -1);
 	$: redoUnavailable = $gamePaused || !($historyIndex < $history.length - 2);
 
-	// 钿哥修改提示函数
+	// 钿哥修改提示
 	function handleHint() {
 		if (hintsAvailable) {
-			// if ($candidates.hasOwnProperty($cursor.x + ',' + $cursor.y)) {
-			// 	candidates.clear($cursor);
-			// }
+			if ($candidates.hasOwnProperty($cursor.x + ',' + $cursor.y)) {
+				candidates.clear($cursor);
+			}
 
-			userGrid.applyHint(settings.maxCandidates);
+			userGrid.applyHint($cursor);
 		}
 	}
 

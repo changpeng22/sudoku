@@ -51,10 +51,7 @@
 	<Switch bind:checked={settings.highlightSame} text="Highlight cells with the same number" id="highlight-matching" />
 	<Switch bind:checked={settings.highlightConflicting} text="Highlight conflicting numbers" id="highlight-conflicting" />
 	<!-- 钿哥增加maxCandidates选项 -->
-	<div transition:slide class="inline-flex items-center">
-		<label for="hints" class="flex-grow text-lg">Max candidates of hints</label>
-		<input bind:value={settings.maxCandidates} class="number-input" id="hints" name="hints" type="number" min="1" max="9"  />
-	</div>
+	<input bind:value={settings.maxCandidates} class="number-input" id="hints" name="hints" type="number" min="0" max="81"  />
 </div>
 
 <div class="flex justify-end">

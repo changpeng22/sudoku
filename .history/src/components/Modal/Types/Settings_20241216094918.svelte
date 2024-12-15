@@ -53,7 +53,7 @@
 	<!-- 钿哥增加maxCandidates选项 -->
 	<div transition:slide class="inline-flex items-center">
 		<label for="hints" class="flex-grow text-lg">Max candidates of hints</label>
-		<input bind:value={settings.maxCandidates} class="number-input" id="hints" name="hints" type="number" min="1" max="9"  />
+		<input bind:value={settings.maxCandidates} class="number-input" id="hints" name="hints" type="number" min="0" max="9"  />
 	</div>
 </div>
 

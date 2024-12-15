@@ -14,14 +14,13 @@
 	$: undoUnavailable = $gamePaused || !($historyIndex > -1);
 	$: redoUnavailable = $gamePaused || !($historyIndex < $history.length - 2);
 
-	// 钿哥修改提示函数
 	function handleHint() {
 		if (hintsAvailable) {
-			// if ($candidates.hasOwnProperty($cursor.x + ',' + $cursor.y)) {
-			// 	candidates.clear($cursor);
-			// }
+			if ($candidates.hasOwnProperty($cursor.x + ',' + $cursor.y)) {
+				candidates.clear($cursor);
+			}
 
-			userGrid.applyHint(settings.maxCandidates);
+			userGrid.applyHint($cursor);
 		}
 	}
 
@@ -93,7 +92,7 @@
 			<span class="badge" class:badge-primary={hintsAvailable}>{$hints}</span>
 		{/if}
 	</button>
-
+	
 	<!-- 常鹏：笔记 -->
 	<button class="btn btn-round btn-badge" on:click={notes.toggle} title="Notes ({$notes ? 'ON' : 'OFF'})">
 		<svg class="icon-outline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">

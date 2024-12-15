@@ -17,9 +17,9 @@
 	// 钿哥修改提示函数
 	function handleHint() {
 		if (hintsAvailable) {
-			// if ($candidates.hasOwnProperty($cursor.x + ',' + $cursor.y)) {
-			// 	candidates.clear($cursor);
-			// }
+			if ($candidates.hasOwnProperty($cursor.x + ',' + $cursor.y)) {
+				candidates.clear($cursor);
+			}
 
 			userGrid.applyHint(settings.maxCandidates);
 		}
