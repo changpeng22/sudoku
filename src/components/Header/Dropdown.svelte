@@ -1,6 +1,6 @@
 <script>
 	import game from '@sudoku/game';
-	import { cpvalidateSencode } from '@sudoku/sencode';
+	import { validateSencode } from '@sudoku/sencode';
 	import { modal } from '@sudoku/stores/modal';
 	import { slide, fade } from 'svelte/transition';
 	import { DIFFICULTIES, DROPDOWN_DURATION, DIFFICULTY_CUSTOM } from '@sudoku/constants';
@@ -52,7 +52,7 @@
 				game.startCustom(value);
 			},
 			// 常鹏：使用自定义的回调函数
-			validate: cpvalidateSencode
+			validate: validateSencode
 		});
 	}
 

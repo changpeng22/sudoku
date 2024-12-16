@@ -18,7 +18,6 @@
 			userGrid.applyHint($cursor);
 		}
 	}
-
 	
 	//常鹏：点击分支事件
 	let branchCount = 0; // 追踪分支计数
