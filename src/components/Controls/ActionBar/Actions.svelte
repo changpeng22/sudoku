@@ -24,17 +24,16 @@
 	let branchCount = 0; // 追踪分支计数
 	function handleNewBranch() {
 		//TODO: 接收一个点击分支的信号，然后保存当前的网格，当 Restart 按钮被点击时，将当前的网格恢复到保存的网格
-		userGrid.saveGrid();//保存当前网格
-
-		branchCount++; 
-
+		let stepIdx = branchCount++;//需要保存的分支索引
+		userGrid.saveGrid(stepIdx);//保存当前网格
 	}
 
 	//常鹏：点击回溯
 	function handleRestart(){
-		//TODO: 接收一个点击分支的信号，然后恢复到上一步的网格
-		userGrid.loadGrid(); // 恢复网格到用户网格
+		//TODO: 接收一个点击分支的信号，然后恢复到上一步的网格,返回对应的undo idx
 		branchCount--;
+		let stepIdx = userGrid.recallGrid(); // 恢复网格到用户网格
+		console.log("stepIdx",stepIdx);
 	}
 	
 </script>
