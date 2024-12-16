@@ -5,3 +5,4 @@
 .idea
 tailwind-full.config.js
 pnpm-lock.yaml
+/.history/
