@@ -12,7 +12,7 @@
 - 退出逻辑：当完全求解、无法继续求解，或达到最大迭代次数时退出
 - 目前返回值类型：键值对
 - 目前运行方法：
-```
+```bash
 npm install
 npm run build(忽略报错)
 cd ./src/node_modules/@sudoku
