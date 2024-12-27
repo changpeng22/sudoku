@@ -1,30 +1,38 @@
 <script>
 	import { candidates } from '@sudoku/stores/candidates';
-	import { userGrid } from '@sudoku/stores/grid';//userGrid是当前的网格
+	import { userGrid,candidatesClicked } from '@sudoku/stores/grid';//常鹏：userGrid是当前的网格，candidatesClicked是点击的候选值
 	import { cursor } from '@sudoku/stores/cursor';
 	import { hints } from '@sudoku/stores/hints';
 	import { notes } from '@sudoku/stores/notes';
 	import { settings } from '@sudoku/stores/settings';
 	import { keyboardDisabled } from '@sudoku/stores/keyboard';
 	import { gamePaused } from '@sudoku/stores/game';
+
 	$: hintsAvailable = $hints > 0;
+
+	//常鹏：获取获取点击的候选值
+	let branchCount = 0; // 追踪分支计数
+	$: if($candidatesClicked['isValid']) {
+		if ($candidates.hasOwnProperty($cursor.x + ',' + $cursor.y)) {
+					candidates.clear($cursor);
+		}
+
+		let stepIdx = branchCount++;//需要保存的分支索引
+		userGrid.saveGrid(stepIdx);//保存当前网格
+		userGrid.set($cursor,$candidatesClicked['value'] );
+
+		candidatesClicked.set({'isValid':false, 'value':-1});
+	}
 
 	function handleHint() {
 		if (hintsAvailable) {
+			console.log("提示候选值：",$candidates);
 			if ($candidates.hasOwnProperty($cursor.x + ',' + $cursor.y)) {
 				candidates.clear($cursor);
 			}
 
 			userGrid.applyHint($cursor);
 		}
-	}
-	
-	//常鹏：点击分支事件
-	let branchCount = 0; // 追踪分支计数
-	function handleNewBranch() {
-		//TODO: 接收一个点击分支的信号，然后保存当前的网格，当 Restart 按钮被点击时，将当前的网格恢复到保存的网格
-		let stepIdx = branchCount++;//需要保存的分支索引
-		userGrid.saveGrid(stepIdx);//保存当前网格
 	}
 
 	//常鹏：点击回溯
@@ -40,13 +48,6 @@
 
 
 <div class="action-buttons space-x-3">
-
-	<button class="btn btn-round" disabled={$gamePaused} title="分支" on:click={handleNewBranch}>
-		<svg class="icon-outline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" 
-				  d="M12 4a8 8 0 1 1-8 8h3l-4-4-4 4h3a10 10 0 1 0 10-10V4z" />
-		</svg>
-	</button>
 
 	<!-- 常鹏：Restart回溯按钮 -->
 	<button class="btn btn-round" disabled={$gamePaused || branchCount <= 0} title="Restart" on:click={handleRestart}>

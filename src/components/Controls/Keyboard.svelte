@@ -13,7 +13,7 @@
 				if (num === 0) {
 					candidates.clear($cursor);
 				} else {
-					candidates.add($cursor, num);
+					candidates.add($cursor, num);//常鹏：cursor是一个对象，$cursor.x和$cursor.y是它的属性
 				}
 				userGrid.set($cursor, 0);
 			} else {

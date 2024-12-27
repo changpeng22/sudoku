@@ -27,6 +27,7 @@
 
 		return gridStore[cursorStore.y][cursorStore.x];
 	}
+
 </script>
 
 <div class="board-padding relative z-10">
@@ -36,10 +37,10 @@
 	<div class="board-padding absolute inset-0 flex justify-center">
 
 		<div class="bg-white shadow-2xl rounded-xl overflow-hidden w-full h-full max-w-xl grid" class:bg-gray-200={$gamePaused}>
-
+			<!-- 常鹏：每个单元格候选值的显示 -->
 			{#each $userGrid as row, y}
 				{#each row as value, x}
-					<Cell {value}
+					<Cell {value} 
 					      cellY={y + 1}
 					      cellX={x + 1}
 					      candidates={$candidates[x + ',' + y]}
@@ -48,7 +49,8 @@
 					      userNumber={$grid[y][x] === 0}
 					      sameArea={$settings.highlightCells && !isSelected($cursor, x, y) && isSameArea($cursor, x, y)}
 					      sameNumber={$settings.highlightSame && value && !isSelected($cursor, x, y) && getValueAtCursor($userGrid, $cursor) === value}
-					      conflictingNumber={$settings.highlightConflicting && $grid[y][x] === 0 && $invalidCells.includes(x + ',' + y)} />
+					      conflictingNumber={$settings.highlightConflicting && $grid[y][x] === 0 && $invalidCells.includes(x + ',' + y)} 
+						  />
 				{/each}
 			{/each}
 
