@@ -1,6 +1,6 @@
 <script>
 	import { CANDIDATE_COORDS } from '@sudoku/constants';
-	import {candidatesClicked} from '@sudoku/stores/grid';
+	import { candidatesClicked } from '@sudoku/stores/candidates';
 	
 	export let candidates = [];
 

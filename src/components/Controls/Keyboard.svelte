@@ -15,13 +15,14 @@
 				} else {
 					candidates.add($cursor, num);//常鹏：cursor是一个对象，$cursor.x和$cursor.y是它的属性
 				}
-				userGrid.set($cursor, 0);
+				userGrid.set($cursor, 0, false); // 钿哥候选值不更新历史数组
 			} else {
 				if ($candidates.hasOwnProperty($cursor.x + ',' + $cursor.y)) {
 					candidates.clear($cursor);
 				}
 
 				userGrid.set($cursor, num);
+				userGrid.applyHint(false);
 			}
 		}
 	}

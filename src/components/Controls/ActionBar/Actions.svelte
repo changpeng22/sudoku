@@ -1,14 +1,14 @@
 <script>
-	import { candidates } from '@sudoku/stores/candidates';
-	import { userGrid,candidatesClicked } from '@sudoku/stores/grid';//常鹏：userGrid是当前的网格，candidatesClicked是点击的候选值
+	import { userGrid } from '@sudoku/stores/grid';
 	import { cursor } from '@sudoku/stores/cursor';
 	import { notes } from '@sudoku/stores/notes';
 	import { settings } from '@sudoku/stores/settings';
 	import { keyboardDisabled } from '@sudoku/stores/keyboard';
 	import { gamePaused } from '@sudoku/stores/game';
 	// 钿哥增加import
-	import { history } from '@sudoku/stores/history';
+	import { history, savedGridStack } from '@sudoku/stores/history';
 	import { hints, numHintCandidate } from '@sudoku/stores/hints';
+	import { candidates, candidatesClicked } from '@sudoku/stores/candidates';
     import { writable } from 'svelte/store';
 
 	// 钿哥修改提示的判断
@@ -22,13 +22,13 @@
         historyIndex.set(history.getHistoryIndex());
         historyLength.set(history.getHistoryLength());
     });
+
     $: undoUnavailable = $gamePaused || !($historyIndex > -1);
     $: redoUnavailable = $gamePaused || !($historyIndex < $historyLength - 2);
 
 	// 钿哥修改提示函数
 	function handleHint() {
 		if (hintsAvailable) {
-			candidates.clearAll();
 			userGrid.applyHint();
 		}
 	}
@@ -37,14 +37,18 @@
 	let branchCount = 0; // 追踪分支计数
 	$: if($candidatesClicked['isValid']) {
 		if ($candidates.hasOwnProperty($cursor.x + ',' + $cursor.y)) {
-					candidates.clear($cursor);
+			candidates.clear($cursor);
 		}
 
 		let stepIdx = branchCount++;//需要保存的分支索引
 		userGrid.saveGrid(stepIdx);//保存当前网格
-		userGrid.set($cursor,$candidatesClicked['value'] );
-
+		userGrid.set($cursor, $candidatesClicked['value']);
 		candidatesClicked.set({'isValid':false, 'value':-1});
+		undoUnavailable = $gamePaused || !($historyIndex > -1);
+		redoUnavailable = $gamePaused || !($historyIndex < $historyLength - 2);
+		if (hintsAvailable) {
+			userGrid.applyHint(false);
+		}
 	}
 
 
@@ -52,10 +56,36 @@
 	function handleRestart(){
 		//TODO: 接收一个点击分支的信号，然后恢复到上一步的网格,返回对应的undo idx
 		branchCount--;
-		let stepIdx = userGrid.recallGrid(); // 恢复网格到用户网格
-		console.log("stepIdx",stepIdx);
+		userGrid.recallGrid(); // 恢复网格到用户网格
 	}
 	
+	// 钿哥：点击撤销
+	function handleUndo(){
+		userGrid.undo();
+		savedGridStack.update(stack => {
+			if (stack.length > 0) {
+				const latestState = stack[stack.length - 1];
+				const [latestGrid, latestHistory, latestHistoryIndex] = latestState; 
+				if (history.getHistoryIndex() === latestHistoryIndex) {
+					branchCount--;
+				}
+			}
+			return stack;
+		});
+		if (hintsAvailable) {
+			candidates.clearAll();
+			userGrid.applyHint(false);
+		}
+	}
+
+	// 钿哥：点击回退
+	function handleRedo(){
+		userGrid.redo();
+		if (hintsAvailable) {
+			candidates.clearAll();
+			userGrid.applyHint(false);
+		}
+	}
 </script>
 
 
@@ -76,14 +106,14 @@
 	
 	
 	<!-- 钿哥增加on:click={undo} -->
-	<button class="btn btn-round" disabled={undoUnavailable} title="Undo" on:click={userGrid.undo}>
+	<button class="btn btn-round" disabled={undoUnavailable} title="Undo" on:click={handleUndo}>
 		<svg class="icon-outline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
 		</svg>
 	</button>
 
 	<!-- 钿哥增加on:click={redo} -->
-	<button class="btn btn-round" disabled={redoUnavailable} title="Redo" on:click={userGrid.redo}>
+	<button class="btn btn-round" disabled={redoUnavailable} title="Redo" on:click={handleRedo}>
 		<svg class="icon-outline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10h-10a8 8 90 00-8 8v2M21 10l-6 6m6-6l-6-6" />
 		</svg>
