@@ -34,7 +34,7 @@
 
 -->
 
-<!-- 钿哥增加maxCandidates选项，删除hintsLimited选项 -->
+<!-- 邱梓钿：增加maxCandidates选项，删除hintsLimited选项 -->
 <div class="flex flex-col mb-6 space-y-3">
 	<!--<Switch bind:checked={settings.darkTheme} text="Enable dark theme" id="dark-theme" />-->
 	<Switch bind:checked={settings.displayTimer} text="Display timer while playing" id="display-timer" />

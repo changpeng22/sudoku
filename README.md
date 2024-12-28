@@ -19,9 +19,23 @@ cd ./src/node_modules/@sudoku
 node sudoku.js
 ```
 
+
 测试外部数独题目
+```
+npm install
+npm run dev
+```
+
 ```javascript
 import {testSudoku} from '@sudoku/sencode/index.js'
 input_url = 'https://www.sudokuwiki.org/sudoku.htm?bd=093824560085600002206075008321769845000258300578040296850016723007082650002507180'
 data = testSudoku(input_url);
+```
 
+## 更新：
+- 增加从数独网站导入数独功能
+- 增加回溯功能，点击候选值即可进入分支
+- 增加撤销和回退功能
+- 增加无解判断，在提示时进行
+- 使用回溯和撤销回退功能时，应用一次提示
+- 增加回溯和撤销回退功能的联动，撤销到回溯那一步时，减少回溯次数

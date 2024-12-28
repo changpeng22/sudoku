@@ -4,7 +4,7 @@
 	import { MODAL_NONE, MODAL_DURATION } from '@sudoku/constants';
 	import types from './Types';
 
-	// 钿哥修改
+	// 邱梓钿：修改
 	const MODALS_DISABLED_OVERLAY = ['welcome', 'gameover', 'nosolution'];
 
 	function handleOverlayClick() {

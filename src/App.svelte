@@ -4,21 +4,21 @@
 	import game from '@sudoku/game';
 	import { modal } from '@sudoku/stores/modal';
 	import { gameWon } from '@sudoku/stores/game';
-	// 钿哥导入
+	// 邱梓钿：导入
 	import { hasSolution } from '@sudoku/stores/grid';
 	import Board from './components/Board/index.svelte';
 	import Controls from './components/Controls/index.svelte';
 	import Header from './components/Header/index.svelte';
 	import Modal from './components/Modal/index.svelte';
 
-	// 钿哥判断是否无解并弹窗
+	// 邱梓钿：判断是否无解并弹窗
 	hasSolution.subscribe(hasSolution => {
 		if (!hasSolution) {
 			game.pause();
 			modal.show('nosolution');
 		}
 	});
-	
+
 	gameWon.subscribe(won => {
 		if (won) {
 			game.pause();

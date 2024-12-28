@@ -1,9 +1,9 @@
-<!-- 钿哥增加history.js用于记录历史操作 -->
+<!-- 邱梓钿：增加history.js用于记录历史操作 -->
 <script>
     import { resumeGame } from '@sudoku/game';
     import { modal } from '@sudoku/stores/modal';
 	import { hasSolution } from '@sudoku/stores/grid';
-    
+
     export const data = {};
 	export let hideModal;
 	
