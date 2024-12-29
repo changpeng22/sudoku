@@ -14,9 +14,7 @@
 - 目前运行方法：
 ```bash
 npm install
-npm run build(忽略报错)
-cd ./src/node_modules/@sudoku
-node sudoku.js
+npm run dev(忽略报错)
 ```
 
 测试外部数独题目
