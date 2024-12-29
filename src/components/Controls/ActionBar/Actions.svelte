@@ -59,7 +59,7 @@
 		userGrid.recallGrid(); // 恢复网格到用户网格
 	}
 	
-	// 邱梓钿：：点击撤销
+	// 邱梓钿：点击撤销
 	function handleUndo(){
 		userGrid.undo();
 		savedGridStack.update(stack => {
@@ -68,6 +68,7 @@
 				const [latestGrid, latestHistory, latestHistoryIndex] = latestState; 
 				if (history.getHistoryIndex() === latestHistoryIndex) {
 					branchCount--;
+					stack.pop();
 				}
 			}
 			return stack;
@@ -78,7 +79,7 @@
 		}
 	}
 
-	// 邱梓钿：：点击回退
+	// 邱梓钿：点击回退
 	function handleRedo(){
 		userGrid.redo();
 		if (hintsAvailable) {
