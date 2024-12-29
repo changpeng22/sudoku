@@ -14,9 +14,7 @@
 - 目前运行方法：
 ```
 npm install
-npm run build(忽略报错)
-cd ./src/node_modules/@sudoku
-node sudoku.js
+npm run dev
 ```
 
 
