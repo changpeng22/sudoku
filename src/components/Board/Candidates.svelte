@@ -1,43 +1,47 @@
 <script>
 	import { CANDIDATE_COORDS } from '@sudoku/constants';
-	import { candidatesClicked } from '@sudoku/stores/candidates';
-	
-	export let candidates = [];
 
-	// 常鹏：候选值点击的回调函数
-	function handleCandidateClick(row, col, value) {
-		//常鹏：单元格中的行/列和点击的值
-	  candidatesClicked.set({'isValid':true,'value':value});
-	}
-  </script>
-  
-  <div class="candidate-grid">
+	export let candidates = [];
+	let showBgcolor = false;
+
+	// 常鹏：检查是否有至少一个候选值可见
+	$: showBgcolor = CANDIDATE_COORDS.some(([row, col], value) =>
+		candidates.includes(value + 1)
+	);
+</script>
+
+<div class:candidate-grid={showBgcolor}>
 	{#each CANDIDATE_COORDS as [row, col], value}
-	  <div class="candidate row-start-{row} col-start-{col}"
-	  	class:invisible={!candidates.includes(value + 1)}
-		class:visible={candidates.includes(value + 1)}  
-		   on:click={()=>{handleCandidateClick(row, col,value+1)}}>
-		{value + 1} <!-- 常鹏：显示候选值 -->
-	  </div>
+		<div
+			class="candidate row-start-{row} col-start-{col}"
+			class:invisible={!candidates.includes(value + 1)}
+			class:visible={candidates.includes(value + 1)}
+		>
+			{value + 1} <!-- 显示候选值 -->
+		</div>
 	{/each}
-  </div>
-  
-  <style>
+</div>
+
+<style>
 	.candidate-grid {
-	  @apply grid h-full w-full p-1;
+		@apply grid h-full w-full p-1;
 	}
-  
+
+	/* 常鹏：候选值背景色 */
+	.candidate-grid {
+		background-color: lightgreen; 
+	}
+
 	.candidate {
-	  @apply h-full w-full row-end-auto col-end-auto leading-full;
-	  cursor: pointer; /* 添加鼠标指针样式 */
+		@apply h-full w-full row-end-auto col-end-auto leading-full;
+		cursor: pointer; /* 鼠标指针样式 */
 	}
-  
+
 	.candidate.invisible {
-	  display: none;
+		display: none;
 	}
-  
+
 	.candidate.visible {
-	  display: block;
+		display: block;
 	}
-  </style>
-  
+</style>

@@ -34,9 +34,10 @@
 		     class:selected={selected}
 		     class:same-area={sameArea}
 		     class:same-number={sameNumber}
-		     class:conflicting-number={conflictingNumber}>
+		     class:conflicting-number={conflictingNumber}
+			 >
 
-			<button class="cell-btn" on:click={cursor.set(cellX - 1, cellY - 1)}>
+			<button class="cell-btn" on:click={cursor.set(cellX - 1, cellY - 1)} >
 				{#if candidates}
 					<Candidates {candidates}/>
 				{:else}
@@ -105,6 +106,7 @@
 	}
 
 	.selected {
+		@apply bg-primary text-white;
 		@apply bg-primary text-white;
 	}
 

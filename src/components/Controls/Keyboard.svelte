@@ -2,7 +2,7 @@
 	import { userGrid } from '@sudoku/stores/grid';
 	import { cursor } from '@sudoku/stores/cursor';
 	import { notes } from '@sudoku/stores/notes';
-	import { candidates } from '@sudoku/stores/candidates';
+	import { candidates,candidatesClicked } from '@sudoku/stores/candidates';
 
 	// TODO: Improve keyboardDisabled
 	import { keyboardDisabled } from '@sudoku/stores/keyboard';
@@ -17,12 +17,17 @@
 				}
 				userGrid.set($cursor, 0, false); // 邱梓钿：候选值不更新历史数组
 			} else {
-				if ($candidates.hasOwnProperty($cursor.x + ',' + $cursor.y)) {
+				//常鹏：修改分支跳转逻辑
+				if ($candidates.hasOwnProperty($cursor.x + ',' + $cursor.y) && $candidates[$cursor.x + ',' + $cursor.y].includes(num)) {
 					candidates.clear($cursor);
+					userGrid.set($cursor, num);
+					candidatesClicked.set({'isValid':true,'value':num});
+
+					// userGrid.applyHint(false);//常鹏：选择分支后取消提示
+				}else{
+					userGrid.set($cursor, num);
 				}
 
-				userGrid.set($cursor, num);
-				userGrid.applyHint(false);
 			}
 		}
 	}
