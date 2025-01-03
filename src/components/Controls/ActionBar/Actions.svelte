@@ -6,7 +6,7 @@
 	import { keyboardDisabled } from '@sudoku/stores/keyboard';
 	import { gamePaused } from '@sudoku/stores/game';
 	// 邱梓钿：增加import
-	import { history, savedGridStack } from '@sudoku/stores/history';
+	import { history, savedGridStack, stackIndex } from '@sudoku/stores/history';
 	import { hints, numHintCandidate } from '@sudoku/stores/hints';
 	import { candidates, candidatesClicked } from '@sudoku/stores/candidates';
     import { writable } from 'svelte/store';
@@ -34,7 +34,7 @@
 	}
 
 	//常鹏：获取获取点击的候选值
-	let branchCount = 0; // 追踪分支计数
+	$: branchCount = $stackIndex;
 	$: if($candidatesClicked['isValid']) {
 		if ($candidates.hasOwnProperty($cursor.x + ',' + $cursor.y)) {
 			candidates.clear($cursor);
@@ -73,19 +73,19 @@
 			}
 			return stack;
 		});
-		if (hintsAvailable) {
-			candidates.clearAll();
-			userGrid.applyHint(false);
-		}
+		// if (hintsAvailable) {
+		// 	candidates.reset();
+		// 	userGrid.applyHint(false);
+		// }
 	}
 
 	// 邱梓钿：点击回退
 	function handleRedo(){
 		userGrid.redo();
-		if (hintsAvailable) {
-			candidates.clearAll();
-			userGrid.applyHint(false);
-		}
+		// if (hintsAvailable) {
+		// 	candidates.reset();
+		// 	userGrid.applyHint(false);
+		// }
 	}
 </script>
 

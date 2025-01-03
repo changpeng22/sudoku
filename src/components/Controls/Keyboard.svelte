@@ -18,14 +18,16 @@
 				userGrid.set($cursor, 0, false); // 邱梓钿：候选值不更新历史数组
 			} else {
 				//常鹏：修改分支跳转逻辑
-				if ($candidates.hasOwnProperty($cursor.x + ',' + $cursor.y) && $candidates[$cursor.x + ',' + $cursor.y].includes(num)) {
-					candidates.clear($cursor);
-					userGrid.set($cursor, num);
+				if ($candidates.hasOwnProperty($cursor.x + ',' + $cursor.y) && $candidates[$cursor.x + ',' + $cursor.y].includes(num) && $candidates[$cursor.x + ',' + $cursor.y].length > 1) {
+					// candidates.clear($cursor);
+					// userGrid.set($cursor, num);
 					candidatesClicked.set({'isValid':true,'value':num});
 
 					// userGrid.applyHint(false);//常鹏：选择分支后取消提示
 				}else{
+					candidates.clear($cursor);
 					userGrid.set($cursor, num);
+					// userGrid.applyHint(false);
 				}
 
 			}
@@ -93,7 +95,8 @@
 				</svg>
 			</button>
 		{:else}
-			<button class="btn btn-key" disabled={$keyboardDisabled} title="Insert {keyNum + 1}" on:click={() => handleKeyButton(keyNum + 1)}>
+		
+			<button class="btn btn-key" disabled={$keyboardDisabled || !(candidates.noCandidates($cursor) || $candidates[$cursor.x + ',' + $cursor.y].includes(keyNum+1))} title="Insert {keyNum + 1}" on:click={() => handleKeyButton(keyNum + 1)}>
 				{keyNum + 1}
 			</button>
 		{/if}
