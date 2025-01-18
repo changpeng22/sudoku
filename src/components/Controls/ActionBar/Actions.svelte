@@ -1,48 +1,92 @@
 <script>
-	import { candidates } from '@sudoku/stores/candidates';
-	import { userGrid,candidatesClicked } from '@sudoku/stores/grid';//常鹏：userGrid是当前的网格，candidatesClicked是点击的候选值
+	import { userGrid } from '@sudoku/stores/grid';
 	import { cursor } from '@sudoku/stores/cursor';
-	import { hints } from '@sudoku/stores/hints';
 	import { notes } from '@sudoku/stores/notes';
 	import { settings } from '@sudoku/stores/settings';
 	import { keyboardDisabled } from '@sudoku/stores/keyboard';
 	import { gamePaused } from '@sudoku/stores/game';
+	// 邱梓钿：增加import
+	import { history, savedGridStack, stackIndex } from '@sudoku/stores/history';
+	import { hints, numHintCandidate } from '@sudoku/stores/hints';
+	import { candidates, candidatesClicked } from '@sudoku/stores/candidates';
+    import { writable } from 'svelte/store';
 
-	$: hintsAvailable = $hints > 0;
+	// 邱梓钿：修改提示的判断
+	$: hintsAvailable = $settings.maxHintCandidate > 0;
+	$: showNumHintCandidate = $numHintCandidate;
+
+	// 邱梓钿：增加undo和redo的判断
+    const historyIndex = writable(history.getHistoryIndex());
+    const historyLength = writable(history.getHistoryLength());
+    history.subscribe(() => {
+        historyIndex.set(history.getHistoryIndex());
+        historyLength.set(history.getHistoryLength());
+    });
+
+    $: undoUnavailable = $gamePaused || !($historyIndex > -1);
+    $: redoUnavailable = $gamePaused || !($historyIndex < $historyLength - 2);
+
+	// 邱梓钿：修改提示函数
+	function handleHint() {
+		if (hintsAvailable) {
+			userGrid.applyHint();
+		}
+	}
 
 	//常鹏：获取获取点击的候选值
-	let branchCount = 0; // 追踪分支计数
+	$: branchCount = $stackIndex;
 	$: if($candidatesClicked['isValid']) {
 		if ($candidates.hasOwnProperty($cursor.x + ',' + $cursor.y)) {
-					candidates.clear($cursor);
+			candidates.clear($cursor);
 		}
 
 		let stepIdx = branchCount++;//需要保存的分支索引
 		userGrid.saveGrid(stepIdx);//保存当前网格
-		userGrid.set($cursor,$candidatesClicked['value'] );
-
+		userGrid.set($cursor, $candidatesClicked['value']);
 		candidatesClicked.set({'isValid':false, 'value':-1});
+		undoUnavailable = $gamePaused || !($historyIndex > -1);
+		redoUnavailable = $gamePaused || !($historyIndex < $historyLength - 2);
+		// if (hintsAvailable) {
+		// 	userGrid.applyHint(false);
+		// }
 	}
 
-	function handleHint() {
-		if (hintsAvailable) {
-			console.log("提示候选值：",$candidates);
-			if ($candidates.hasOwnProperty($cursor.x + ',' + $cursor.y)) {
-				candidates.clear($cursor);
-			}
-
-			userGrid.applyHint($cursor);
-		}
-	}
 
 	//常鹏：点击回溯
 	function handleRestart(){
 		//TODO: 接收一个点击分支的信号，然后恢复到上一步的网格,返回对应的undo idx
 		branchCount--;
-		let stepIdx = userGrid.recallGrid(); // 恢复网格到用户网格
-		console.log("stepIdx",stepIdx);
+		userGrid.recallGrid(); // 恢复网格到用户网格
 	}
 	
+	// 邱梓钿：点击撤销
+	function handleUndo(){
+		userGrid.undo();
+		savedGridStack.update(stack => {
+			if (stack.length > 0) {
+				const latestState = stack[stack.length - 1];
+				const [latestGrid, latestHistory, latestHistoryIndex] = latestState; 
+				if (history.getHistoryIndex() === latestHistoryIndex) {
+					branchCount--;
+					stack.pop();
+				}
+			}
+			return stack;
+		});
+		// if (hintsAvailable) {
+		// 	candidates.reset();
+		// 	userGrid.applyHint(false);
+		// }
+	}
+
+	// 邱梓钿：点击回退
+	function handleRedo(){
+		userGrid.redo();
+		// if (hintsAvailable) {
+		// 	candidates.reset();
+		// 	userGrid.applyHint(false);
+		// }
+	}
 </script>
 
 
@@ -58,42 +102,43 @@
 
 		{#if branchCount >= 0}
         <span class="branch-count">{branchCount}</span>
-    	{/if}
+		{/if}
 	</button>
 	
 	
-	<!-- 常鹏：上一步 -->
-	<button class="btn btn-round" disabled={$gamePaused} title="Undo">
+	<!-- 邱梓钿：增加on:click={undo} -->
+	<button class="btn btn-round" disabled={undoUnavailable} title="Undo" on:click={handleUndo}>
 		<svg class="icon-outline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
 		</svg>
 	</button>
 
-	<!-- 常鹏：下一步 -->
-	<button class="btn btn-round" disabled={$gamePaused} title="Redo">
+	<!-- 邱梓钿：增加on:click={redo} -->
+	<button class="btn btn-round" disabled={redoUnavailable} title="Redo" on:click={handleRedo}>
 		<svg class="icon-outline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10h-10a8 8 90 00-8 8v2M21 10l-6 6m6-6l-6-6" />
 		</svg>
 	</button>
 
-	<!-- 常鹏：提示 -->
-	<button class="btn btn-round btn-badge" disabled={$keyboardDisabled || !hintsAvailable || $userGrid[$cursor.y][$cursor.x] !== 0} on:click={handleHint} title="Hints ({$hints})">
+	<!-- 邱梓钿：修改判定条件 -->
+	<button class="btn btn-round btn-badge" disabled={!hintsAvailable} on:click={handleHint} title="Hints ({$hints})">
 		<svg class="icon-outline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
 		</svg>
 
-		{#if $settings.hintsLimited}
-			<span class="badge" class:badge-primary={hintsAvailable}>{$hints}</span>
+		{#if hintsAvailable}
+			<span class="badge" class:badge-primary={hintsAvailable}>{showNumHintCandidate}</span>
 		{/if}
 	</button>
+
 	<!-- 常鹏：笔记 -->
-	<button class="btn btn-round btn-badge" on:click={notes.toggle} title="Notes ({$notes ? 'ON' : 'OFF'})">
+	<!-- <button class="btn btn-round btn-badge" on:click={notes.toggle} title="Notes ({$notes ? 'ON' : 'OFF'})">
 		<svg class="icon-outline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
 		</svg>
 
 		<span class="badge tracking-tighter" class:badge-primary={$notes}>{$notes ? 'ON' : 'OFF'}</span>
-	</button>
+	</button> -->
 </div>
 
 

@@ -4,7 +4,7 @@
 	import { settings as settingsStore } from '@sudoku/stores/settings';
 	import { MAX_HINTS } from '@sudoku/constants';
 
-	export let data = {};
+	// export let data = {};
 	export let hideModal;
 
 	let settings = { ...$settingsStore };
@@ -34,22 +34,27 @@
 
 -->
 
+<!-- 邱梓钿：增加maxCandidates选项，删除hintsLimited选项 -->
 <div class="flex flex-col mb-6 space-y-3">
 	<!--<Switch bind:checked={settings.darkTheme} text="Enable dark theme" id="dark-theme" />-->
 	<Switch bind:checked={settings.displayTimer} text="Display timer while playing" id="display-timer" />
 
-	<Switch bind:checked={hintsLimited} text="Limit the number of hints available" id="hints-limited" />
+	<!-- <Switch bind:checked={hintsLimited} text="Limit the number of hints available" id="hints-limited" />
 	{#if hintsLimited}
 		<div transition:slide class="inline-flex items-center">
 			<label for="hints" class="flex-grow text-lg">Number of available hints</label>
 
 			<input bind:value={settings.hints} class="number-input" id="hints" name="hints" type="number" min="0" max="81" />
 		</div>
-	{/if}
+	{/if} -->
 
 	<Switch bind:checked={settings.highlightCells} text="Highlight cells in same row/column/box" id="highlight-cells" />
 	<Switch bind:checked={settings.highlightSame} text="Highlight cells with the same number" id="highlight-matching" />
 	<Switch bind:checked={settings.highlightConflicting} text="Highlight conflicting numbers" id="highlight-conflicting" />
+	<div transition:slide class="inline-flex items-center">
+		<label for="hints" class="flex-grow text-lg">Max candidates of hints</label>
+		<input bind:value={settings.maxHintCandidate} class="number-input" id="hints" name="hints" type="number" min="0" max="9"  />
+	</div>
 </div>
 
 <div class="flex justify-end">

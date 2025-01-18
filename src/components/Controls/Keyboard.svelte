@@ -1,8 +1,8 @@
 <script>
-	import { userGrid } from '@sudoku/stores/grid';
+	import { userGrid,getFilledNumbers } from '@sudoku/stores/grid';
 	import { cursor } from '@sudoku/stores/cursor';
 	import { notes } from '@sudoku/stores/notes';
-	import { candidates } from '@sudoku/stores/candidates';
+	import { candidates,candidatesClicked } from '@sudoku/stores/candidates';
 
 	// TODO: Improve keyboardDisabled
 	import { keyboardDisabled } from '@sudoku/stores/keyboard';
@@ -15,13 +15,21 @@
 				} else {
 					candidates.add($cursor, num);//常鹏：cursor是一个对象，$cursor.x和$cursor.y是它的属性
 				}
-				userGrid.set($cursor, 0);
+				userGrid.set($cursor, 0, false); // 邱梓钿：候选值不更新历史数组
 			} else {
-				if ($candidates.hasOwnProperty($cursor.x + ',' + $cursor.y)) {
+				//常鹏：修改分支跳转逻辑
+				if ($candidates.hasOwnProperty($cursor.x + ',' + $cursor.y) && $candidates[$cursor.x + ',' + $cursor.y].includes(num) && $candidates[$cursor.x + ',' + $cursor.y].length > 1) {
+					// candidates.clear($cursor);
+					// userGrid.set($cursor, num);
+					candidatesClicked.set({'isValid':true,'value':num});
+
+					// userGrid.applyHint(false);//常鹏：选择分支后取消提示
+				}else{
 					candidates.clear($cursor);
+					userGrid.set($cursor, num);
+					// userGrid.applyHint(false);
 				}
 
-				userGrid.set($cursor, num);
 			}
 		}
 	}
@@ -87,7 +95,8 @@
 				</svg>
 			</button>
 		{:else}
-			<button class="btn btn-key" disabled={$keyboardDisabled} title="Insert {keyNum + 1}" on:click={() => handleKeyButton(keyNum + 1)}>
+		
+			<button class="btn btn-key" disabled={$keyboardDisabled || !(candidates.noCandidates($cursor) || $candidates[$cursor.x + ',' + $cursor.y].includes(keyNum+1)) || getFilledNumbers($cursor).includes(keyNum+1)} title="Insert {keyNum + 1}" on:click={() => handleKeyButton(keyNum + 1)}>
 				{keyNum + 1}
 			</button>
 		{/if}

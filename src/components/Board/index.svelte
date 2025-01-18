@@ -40,17 +40,17 @@
 			<!-- 常鹏：每个单元格候选值的显示 -->
 			{#each $userGrid as row, y}
 				{#each row as value, x}
-					<Cell {value} 
-					      cellY={y + 1}
-					      cellX={x + 1}
-					      candidates={$candidates[x + ',' + y]}
-					      disabled={$gamePaused}
-					      selected={isSelected($cursor, x, y)}
-					      userNumber={$grid[y][x] === 0}
-					      sameArea={$settings.highlightCells && !isSelected($cursor, x, y) && isSameArea($cursor, x, y)}
-					      sameNumber={$settings.highlightSame && value && !isSelected($cursor, x, y) && getValueAtCursor($userGrid, $cursor) === value}
-					      conflictingNumber={$settings.highlightConflicting && $grid[y][x] === 0 && $invalidCells.includes(x + ',' + y)} 
-						  />
+						<Cell {value} 
+						cellY={y + 1}
+						cellX={x + 1}
+						candidates={$candidates[x + ',' + y]}
+						disabled={$gamePaused}
+						selected={isSelected($cursor, x, y)}
+						userNumber={$grid[y][x] === 0}
+						sameArea={$settings.highlightCells && !isSelected($cursor, x, y) && isSameArea($cursor, x, y)}
+						sameNumber={$settings.highlightSame && value && !isSelected($cursor, x, y) && getValueAtCursor($userGrid, $cursor) === value}
+						conflictingNumber={$settings.highlightConflicting && $grid[y][x] === 0 && $invalidCells.includes(x + ',' + y)} 
+						/>
 				{/each}
 			{/each}
 
