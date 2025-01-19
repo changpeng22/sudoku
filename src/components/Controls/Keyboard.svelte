@@ -27,7 +27,7 @@
 				}else{
 					candidates.clear($cursor);
 					userGrid.set($cursor, num);
-					// userGrid.applyHint(false);
+					userGrid.applyHint(false);
 				}
 
 			}

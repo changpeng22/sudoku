@@ -6,7 +6,7 @@
 	import { keyboardDisabled } from '@sudoku/stores/keyboard';
 	import { gamePaused } from '@sudoku/stores/game';
 	// 邱梓钿：增加import
-	import { history, savedGridStack, stackIndex } from '@sudoku/stores/history';
+	import { history, branchCount, canUndo, canRedo } from '@sudoku/stores/history';
 	import { hints, numHintCandidate } from '@sudoku/stores/hints';
 	import { candidates, candidatesClicked } from '@sudoku/stores/candidates';
     import { writable } from 'svelte/store';
@@ -16,15 +16,10 @@
 	$: showNumHintCandidate = $numHintCandidate;
 
 	// 邱梓钿：增加undo和redo的判断
-    const historyIndex = writable(history.getHistoryIndex());
-    const historyLength = writable(history.getHistoryLength());
-    history.subscribe(() => {
-        historyIndex.set(history.getHistoryIndex());
-        historyLength.set(history.getHistoryLength());
-    });
-
-    $: undoUnavailable = $gamePaused || !($historyIndex > -1);
-    $: redoUnavailable = $gamePaused || !($historyIndex < $historyLength - 2);
+    $: undoUnavailable = $gamePaused || !($canUndo);
+    $: redoUnavailable = $gamePaused || !($canRedo);
+	$: backtrackUnavailable = $gamePaused || !($branchCount > 0);
+	$: showBranchCount = $branchCount;
 
 	// 邱梓钿：修改提示函数
 	function handleHint() {
@@ -34,75 +29,67 @@
 	}
 
 	//常鹏：获取获取点击的候选值
-	$: branchCount = $stackIndex;
 	$: if($candidatesClicked['isValid']) {
 		if ($candidates.hasOwnProperty($cursor.x + ',' + $cursor.y)) {
 			candidates.clear($cursor);
 		}
 
-		let stepIdx = branchCount++;//需要保存的分支索引
-		userGrid.saveGrid(stepIdx);//保存当前网格
+		history.markBranch();//保存当前网格
 		userGrid.set($cursor, $candidatesClicked['value']);
 		candidatesClicked.set({'isValid':false, 'value':-1});
-		undoUnavailable = $gamePaused || !($historyIndex > -1);
-		redoUnavailable = $gamePaused || !($historyIndex < $historyLength - 2);
-		// if (hintsAvailable) {
-		// 	userGrid.applyHint(false);
-		// }
+		undoUnavailable = $gamePaused || !($canUndo);
+		redoUnavailable = $gamePaused || !($canRedo);
+		backtrackUnavailable = $gamePaused || !($branchCount > 0);
+		showBranchCount = $branchCount;
+		if (hintsAvailable) {
+			userGrid.applyHint(false);
+		}
 	}
 
 
 	//常鹏：点击回溯
-	function handleRestart(){
-		//TODO: 接收一个点击分支的信号，然后恢复到上一步的网格,返回对应的undo idx
-		branchCount--;
-		userGrid.recallGrid(); // 恢复网格到用户网格
+	function handleBacktrack(){
+		userGrid.backtrack();
+		if (hintsAvailable) {
+			candidates.reset();
+			userGrid.applyHint(false);
+		}
 	}
 	
 	// 邱梓钿：点击撤销
 	function handleUndo(){
 		userGrid.undo();
-		savedGridStack.update(stack => {
-			if (stack.length > 0) {
-				const latestState = stack[stack.length - 1];
-				const [latestGrid, latestHistory, latestHistoryIndex] = latestState; 
-				if (history.getHistoryIndex() === latestHistoryIndex) {
-					branchCount--;
-					stack.pop();
-				}
-			}
-			return stack;
-		});
-		// if (hintsAvailable) {
-		// 	candidates.reset();
-		// 	userGrid.applyHint(false);
-		// }
+		if (hintsAvailable) {
+			candidates.reset();
+			userGrid.applyHint(false);
+		}
 	}
 
 	// 邱梓钿：点击回退
 	function handleRedo(){
 		userGrid.redo();
-		// if (hintsAvailable) {
-		// 	candidates.reset();
-		// 	userGrid.applyHint(false);
-		// }
+		if (hintsAvailable) {
+			candidates.reset();
+			userGrid.applyHint(false);
+		}
 	}
 </script>
 
 
 
 <div class="action-buttons space-x-3">
-
-	<!-- 常鹏：Restart回溯按钮 -->
-	<button class="btn btn-round" disabled={$gamePaused || branchCount <= 0} title="Restart" on:click={handleRestart}>
+	<!-- 常鹏：Backtrack回溯按钮 -->
+	<button class="btn btn-round" disabled={backtrackUnavailable} title="Backtrack" on:click={handleBacktrack}>
 		<svg class="icon-outline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" 
 				  d="M12 4a8 8 0 1 1-8 8h3l-4-4-4 4h3a10 10 0 1 0 10-10V4z" />
 		</svg>
 
-		{#if branchCount >= 0}
-        <span class="branch-count">{branchCount}</span>
+		{#if showBranchCount >= 0}
+        <span class="branch-count">{showBranchCount}</span>
 		{/if}
+		<!-- 打印多个变量 -->
+		<!-- <span>组合变量: {showBranchCount} 和 {$branchCount}</span> -->
 	</button>
 	
 	
