@@ -34,7 +34,7 @@
 			candidates.clear($cursor);
 		}
 
-		history.markBranch();//保存当前网格
+		history.markBranch([$cursor, $candidatesClicked['value']]);//保存当前网格
 		userGrid.set($cursor, $candidatesClicked['value']);
 		candidatesClicked.set({'isValid':false, 'value':-1});
 		undoUnavailable = $gamePaused || !($canUndo);
@@ -49,11 +49,14 @@
 
 	//常鹏：点击回溯
 	function handleBacktrack(){
-		userGrid.backtrack();
+		let excludeCandidate = userGrid.backtrack();
 		if (hintsAvailable) {
 			candidates.reset();
 			userGrid.applyHint(false);
 		}
+		// 邱梓钿：排除已探索分支候选值
+		let [pos, value] = excludeCandidate;
+		candidates.add(pos, value);
 	}
 	
 	// 邱梓钿：点击撤销
