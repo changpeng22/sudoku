@@ -55,8 +55,9 @@
 			userGrid.applyHint(false);
 		}
 		// 邱梓钿：排除已探索分支候选值
-		let [pos, value] = excludeCandidate;
-		candidates.add(pos, value);
+		for (const [pos, value] of excludeCandidate) {
+			candidates.add(pos, value);
+		}
 	}
 	
 	// 邱梓钿：点击撤销
